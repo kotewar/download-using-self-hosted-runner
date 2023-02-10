@@ -1,4 +1,4 @@
-name: Support workflow with http client
+name: Support workflow without http client
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
     - run: ls -al
     - name: attempt to hit cache
       id: cache-attempt
-      uses: actions/cache@v3
+      uses: kotewar/cache@main
       with:
         path: ${{ env.CACHE_PATH }}
         key: ${{ env.CACHE_PATH }}-${{ env.CACHE_SIZE }}
