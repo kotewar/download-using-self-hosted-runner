@@ -1,0 +1,35 @@
+name: Support workflow with http client
+
+on:
+  workflow_dispatch:
+#  schedule:
+#  - cron: "*/60 * * * *"
+
+env:
+  CACHE_PATH: cache-hammer
+  CACHE_SIZE: 2
+
+jobs:
+  cached:
+    runs-on: self-hosted
+    strategy:
+      matrix:
+        jobs: [1, 2, 3, 4]
+        os: ["macos-10.15", "macos-11", "macos-12"]
+    steps:
+    - uses: actions/checkout@v3
+    - run: ls -al
+    - name: attempt to hit cache
+      id: cache-attempt
+      uses: kotewar/cache@main
+      with:
+        path: ${{ env.CACHE_PATH }}
+        key: ${{ env.CACHE_PATH }}-${{ env.CACHE_SIZE }}
+      env:
+        DOWNLOAD_WITH_HTTP_CLIENT: true
+    - name: generate stuff to cache
+      if: steps.cache-attempt.outputs.cache-hit != 'true'
+      run: |
+        # mkfile $CACHE_SIZE $CACHE_PATH
+        dd if=/dev/urandom of="$CACHE_PATH" bs=1g count="$CACHE_SIZE"
+        ls -alh $CACHE_PATH
